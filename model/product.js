@@ -1,4 +1,9 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+
+const image_schema = new mongoose.Schema({
+    url: String,
+    filename: String
+})
 
 const product_schema = new mongoose.Schema({
     name: {
@@ -17,7 +22,7 @@ const product_schema = new mongoose.Schema({
     description: {
         type: String,
     },
-    images: [{type: String}],
+    images:[image_schema],
     stock: {
         type: Number,
         default: 0
