@@ -9,7 +9,7 @@ const app = express();
 const multer = require('multer')
 const { cloudinary, storage, checkCloudinaryConnection } = require('./cloudinary/main.js')
 
-app.use(cors({ origin: '*' }))
+app.use(cors({ origin: process.env.FRONTEND_URL || '*' }))
 
 
 app.use(express.json());
