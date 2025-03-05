@@ -9,12 +9,13 @@ const app = express();
 const multer = require('multer')
 const { cloudinary, storage, checkCloudinaryConnection } = require('./cloudinary/main.js')
 
-app.use(cors({ origin: 'http://localhost:5173' }))
+app.use(cors({ origin: '*' }))
 
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-const dbUrl = 'mongodb://127.0.0.1:27017/marble_db';
+const dbUrl = process.env.DB_URL || 'mongodb://127.0.0.1:27017/marble_db';
 
 mongoose.connect(dbUrl);
 
@@ -188,14 +189,14 @@ app.get('/orders', async(req, res) => {
 
 
 
-app.post('/add-product', upload.array('images', 5), async (req, res) => {
+app.post('/add-product', upload.single('image'), async (req, res) => {
     try {
         const { name, price, wheretouse, category, description, stock } = req.body;
 
-        const images = req.files.map(file => ({
-            url: file.path,
-            filename: file.filename
-        }));
+        console.log({ name, price, wheretouse, category, description, stock })
+
+        const image =  { url: req.file.path, filename: req.file.filename }
+            
 
         const product = new Product({
             name,
@@ -203,7 +204,7 @@ app.post('/add-product', upload.array('images', 5), async (req, res) => {
             wheretouse,
             category,
             description,
-            images,
+            image,
             stock
         });
 
@@ -214,6 +215,7 @@ app.post('/add-product', upload.array('images', 5), async (req, res) => {
         res.status(500).json({ error: 'Error adding product' });
     }
 });
+
 app.get('/orders/:uid', async (req, res) => {
     try {
         const { uid } = req.params;

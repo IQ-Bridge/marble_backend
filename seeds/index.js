@@ -28,14 +28,10 @@ const generateRandomProducts = (num) => {
             wheretouse: sample(whereToUseOptions),
             category: sample(categories),
             description: `This is a randomly generated product description for Product ${i + 1}.`,
-            images: [ {
+            image: {
                 url: 'https://res.cloudinary.com/dskpugzno/image/upload/v1740824235/products/jnpjb0ejtyl351p7qtmh.png',
                 filename: 'products/jnpjb0ejtyl351p7qtmh',
               },
-              {
-                url: 'https://res.cloudinary.com/dskpugzno/image/upload/v1740824236/products/auo7jdxq99rzyfkgmxlo.png',
-                filename: 'products/auo7jdxq99rzyfkgmxlo',
-              }],
             stock: Math.floor(Math.random() * 50) + 1
         });
     }
