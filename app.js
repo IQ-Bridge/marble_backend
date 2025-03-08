@@ -9,13 +9,13 @@ const app = express();
 const multer = require('multer')
 const { cloudinary, storage, checkCloudinaryConnection } = require('./cloudinary/main.js')
 
-app.use(cors({ origin: process.env.FRONTEND_URL || '*' }))
+app.use(cors({ origin: '*' }))
 
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-const dbUrl = process.env.DB_URL || 'mongodb://127.0.0.1:27017/marble_db';
+// process.env.DB_URL ||
+const dbUrl =  'mongodb://127.0.0.1:27017/marble_db';
 
 mongoose.connect(dbUrl);
 
@@ -113,10 +113,11 @@ app.post('/user/register', async (req, res) => {
         const { name, uid, phone_number, email, address } = req.body;
         const user = new User({ name: name, uid: uid, phone_number: phone_number, email: email, address: address })
 await user.save();
-        res.json({ message: 'User Added Successfully', user: user })
+console.log(user)
+        res.json({ message: 'User Added Successfully', success: true, user: user })
     } catch (e) {
         console.error(e)
-        res.status(400).json({ message: 'Internal Server Error' })
+        res.status(400).json({ message: 'Internal Server Error', success: false })
     }
 });
 
@@ -124,6 +125,8 @@ await user.save();
 app.post('/orders', async (req, res) => {
     try {
         const { userId, products } = req.body;
+
+        console.log('Order Received')
 
         if (!userId || !products.length) {
             return res.status(400).json({ error: 'User ID and products are required' });
@@ -240,6 +243,6 @@ app.get('/hello-world', async (req, res) => {
 
 
 
-app.listen(3000, () => {
+app.listen(3000, '0.0.0.0', () => {
     console.log('Listening to the port 3000')
 })

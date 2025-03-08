@@ -38,3 +38,4 @@ module.exports = Product
 /// user:  name, phone, email, address
 /// admin: name, phone, email, products
 /// order: products: [{product, quantity}], total_amount  
+
