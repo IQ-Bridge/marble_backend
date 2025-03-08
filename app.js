@@ -126,46 +126,45 @@ app.post('/orders', async (req, res) => {
     try {
         const { userId, products } = req.body;
 
-        console.log('Order Received')
+        console.log('Order Received');
 
         if (!userId || !products.length) {
             return res.status(400).json({ error: 'User ID and products are required' });
         }
 
         const user = await User.findOne({ uid: userId });
-
         if (!user) {
             return res.status(400).json({ error: 'User not found' });
         }
 
-        // Fetch all products in a single query
         const productIds = products.map(item => item.product);
         const foundProducts = await Product.find({ _id: { $in: productIds } });
 
-        console.log("Found Products:", foundProducts); // Debugging
-
-        // Ensure all products exist
         if (foundProducts.length !== products.length) {
             return res.status(404).json({ error: 'One or more products not found' });
         }
 
-        // Calculate total amount
         let totalAmount = 0;
-        products.forEach(item => {
+
+        for (const item of products) {
             const product = foundProducts.find(p => p._id.toString() === item.product.toString());
 
             if (product) {
-                console.log(`Product: ${product.name}, Price: ${product.price}, Quantity: ${item.quantity}`); // Debugging
+                if (product.stock < item.quantity) {
+                    return res.status(400).json({ error: `Not enough stock for ${product.name}` });
+                }
+
                 totalAmount += product.price * item.quantity;
+
+                // Reduce stock
+                product.stock -= item.quantity;
+                await product.save();
             }
-        });
+        }
 
-        console.log("Total Amount:", totalAmount); // Debugging
-
-        // Create new order
         const newOrder = new Order({
             user: user._id,
-            products: products,
+            products,
             total_amount: totalAmount
         });
 
@@ -177,6 +176,7 @@ app.post('/orders', async (req, res) => {
         res.status(500).json({ error: 'Error placing order', message: err.message });
     }
 });
+
 
 
 app.get('/orders', async(req, res) => {
@@ -235,6 +235,20 @@ app.get('/orders/:uid', async (req, res) => {
     }
 })
 
+app.delete("/delete-product/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deletedProduct = await Product.findByIdAndDelete(id);
+  
+      if (!deletedProduct) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+  
+      res.json({ message: "Product deleted successfully", deletedProduct });
+    } catch (error) {
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  });
 
 
 app.get('/hello-world', async (req, res) => {
