@@ -181,7 +181,7 @@ app.post('/orders', async (req, res) => {
 
 app.get('/orders', async(req, res) => {
     try{
-        console.log('fetching orders')
+       console.log('fetching orders')
        const orders = await Order.find({}).populate('products.product').populate('user');
        res.json({orders: orders, message: 'successsfully fetched the orders'})
     }catch(e){
