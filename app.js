@@ -15,7 +15,7 @@ app.use(cors({ origin: '*' }))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // 
-const dbUrl = 'mongodb://127.0.0.1:27017/marble_db';
+const dbUrl = process.env.DB_URL ||  'mongodb://127.0.0.1:27017/marble_db';
 
 mongoose.connect(dbUrl);
 
