@@ -15,7 +15,7 @@ app.use(cors({ origin: '*' }))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // 
-const dbUrl = process.env.DB_URL || 'mongodb://127.0.0.1:27017/marble_db';
+const dbUrl = 'mongodb://127.0.0.1:27017/marble_db';
 
 mongoose.connect(dbUrl);
 
@@ -84,11 +84,14 @@ app.get('/admin/:uid', async (req, res) => {
     try {
 
         const { uid } = req.params;
+        console.log(uid)
         const admin = await Admin.findOne({ uid: uid })
 
         if (!admin) {
             return res.status(400).json({ message: 'Admin Not Found for this UID' })
         }
+
+        res.json({admin: admin})
     } catch (e) {
         console.error(e)
         res.status(400).json({ message: 'Internal Server Error' })
